@@ -1,13 +1,11 @@
 /* INCLUDES */
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
-#include <string.h>
 #include <windows.h>
 
 
 /* MACROS */
-#define   ELF_FILE          "LED.elf"
+#define   ELF_FILE          "file.elf" //change the name of the elf file 
 #define   ELF_TYPE_LOAD     1U
 #define   OK                0U
 #define   NOT_OK            1U
@@ -77,15 +75,6 @@ uint8_t ElfFile_LoadSegments(Elf_ProgramHeader_t* Elf_ProgramHeader , Elf_Header
 
 void main(void)
 {
-  /* for usb */
-  HANDLE h1;
-  uint8_t h1_buffer[2] ; 
-  uint8_t h2_buffer[2];//1024
-  DWORD byteswritten = 0, bytesread = 0;
-  
-
-
-  /* for elf file */
   uint8_t data[1024*1024]={0};
 	uint8_t ElfFileSize ;
 
@@ -117,33 +106,19 @@ void main(void)
       printf("Text_physical_address = %x\n",Text_physical_address);
       printf("Data_physical_address = %x\n",Data_physical_address);
       printf("Bss_physical_address = %x\n",Bss_physical_address);
+
+      printf("Text_size = %x\n",Text_size);
+      printf("data_size = %x\n",data_size);
+      printf("bss_size = %x\n",bss_size);
+
 	  }
-		//start address???
-		uint32_t InfoBuffer []={Text_physical_address,Text_size+data_size,Elf_Header->entry,Data_physical_address,data_size};
-		InfoFilePtr= fopen("INFO_FILE.txt" , "w");
+
+		uint32_t InfoBuffer [] = {Text_physical_address,Text_size+data_size,Elf_Header->entry,Data_physical_address,data_size};
+		
+    InfoFilePtr= fopen("INFO_FILE.txt" , "w");
 		fwrite(&InfoBuffer, 5, 4, InfoFilePtr);
-		//fprintf(InfoFilePtr,"%x\n%x\n%x",InfoBuffer[0],InfoBuffer[1],InfoBuffer[2]);
-   
     fclose(InfoFilePtr);
 	}
-
-  /* for usb 
-  h1 = GetSerialPort("COM4");
-
-  while(1)
-  {
-        WriteFile(h1, DataBuffer , 1 , &byteswritten, NULL);//h1_buffer //data_size
-        //for(int i=0; i<100 ; i++);
-        ReadFile(h1, h2_buffer,  2 , &bytesread, NULL);
-        //for(int i=0; i<100 ; i++);
-        
-        if (bytesread)
-        printf("%s\n", h2_buffer);
-        else
-            printf("Nothing read\n");        
-    }
-
-    CloseHandle(h1); */
 
 
 }
@@ -226,7 +201,7 @@ uint8_t ElfFile_Load(uint8_t* ElfFileData ,	uint8_t ElfFileSize)
   }
   else
   {
-    fread(ElfFileData,1, ElfFileSize+1, FilePtr);//+1????
+    fread(ElfFileData,1, ElfFileSize+1, FilePtr);
     fclose(FilePtr);
 	}
   return 	ElfFile_Status;
@@ -249,6 +224,11 @@ uint8_t ElfFile_LoadSegments(Elf_ProgramHeader_t* Elf_ProgramHeader , Elf_Header
   Data_physical_address = Elf_ProgramHeader[1].physical_address;
   Bss_physical_address = Elf_ProgramHeader[2].physical_address;
 
+  printf("Elf_ProgramHeader[0].type = %x\n", Elf_ProgramHeader[0].type);// Size in memory
+  printf("Elf_ProgramHeader[1].type = %x\n", Elf_ProgramHeader[1].type);// Size in memory
+  printf("Elf_ProgramHeader[Ph_in2dex].type = %x\n", Elf_ProgramHeader[2].type);// Size in memory
+  
+  
   for(Ph_index = 0; Ph_index < Elf_Header->ph_num; Ph_index++)
   {
       if(Elf_ProgramHeader[Ph_index].type == ELF_TYPE_LOAD)
@@ -296,29 +276,9 @@ uint8_t ElfFile_LoadSegments(Elf_ProgramHeader_t* Elf_ProgramHeader , Elf_Header
 
       }
 	}
+
   fclose(ElfFilePtr);
 	return 	ElfFile_Status;
 }
 
 
-/* for usb */
-HANDLE GetSerialPort(char *p)
-{
-    HANDLE hSerial;
-    hSerial = CreateFile(p,
-                         GENERIC_READ | GENERIC_WRITE,
-                         0,
-                         0,
-                         OPEN_EXISTING,
-                         FILE_ATTRIBUTE_NORMAL,
-                         0);
-
-    DCB dcbSerialParams = {0};
-    dcbSerialParams.DCBlength=sizeof(dcbSerialParams);
-    dcbSerialParams.BaudRate=CBR_9600;
-    dcbSerialParams.ByteSize=8;
-    dcbSerialParams.StopBits=ONESTOPBIT;
-    dcbSerialParams.Parity=NOPARITY;
-    SetCommState(hSerial, &dcbSerialParams);
-    return hSerial;
-}

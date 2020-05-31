@@ -4,7 +4,7 @@ from elftools.elf.elffile import ELFFile
 
 
 def main():
-    with open('led_program.elf', 'rb') as f:
+    with open('bootloader-dummy-app.elf', 'rb') as f:
         e=ELFFile(f)
         TextPhysicalAddress=0
         APPSize=0

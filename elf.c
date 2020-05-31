@@ -7,7 +7,7 @@
 
 
 /* MACROS */
-#define   ELF_FILE          "LED.elf"
+#define   ELF_FILE          "led_program.elf"
 #define   ELF_TYPE_LOAD     1U
 #define   OK                0U
 #define   NOT_OK            1U

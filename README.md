@@ -1,6 +1,11 @@
 # ELF-parser
 A PC application that parsers the ARM32 executable .ELF file for the bootloader
 
+## How to use python parser
+```bash
+sudo pip3 install pyelftools
+```
+
 ## References
 ### ELF file format
 [ELF and ABI Standards: Tool Interface Standard (TIS) Portable Formats Specification, version 1.2](https://refspecs.linuxfoundation.org/elf/elf.pdf)
@@ -11,8 +16,3 @@ A PC application that parsers the ARM32 executable .ELF file for the bootloader
 
 ### Intel HEX format
 [GENERAL: INTEL HEX FILE FORMAT](http://www.keil.com/support/docs/1584/)
-
-## How to use python parser
-```bash
-sudo pip3 install pyelftools
-```
